@@ -155,7 +155,7 @@
             tableRowClassName({row, rowIndex}) {
                 if (row.temp2m >= 30) {
                     return 'hot-row';
-                } else if (rowIndex === 3) {
+                } else if (row.temp2m < 25) {
                     return 'cold-row';
                 }
                 return '';
