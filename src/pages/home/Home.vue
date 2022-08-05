@@ -1,16 +1,16 @@
 <template>
     <el-container style="justify-content: center; position: absolute; width: 100%;height: 100%;">
-        <el-header>
-            <el-tooltip :disabled="search ? false : true" placement="bottom" :open-delay="open_delay_time">
-                <div slot="content">{{search}}</div>
+        <el-header style="margin-top: 20px">
+            <el-tooltip :disabled="search.length ? false : true" placement="bottom" :open-delay="open_delay_time">
+                <div slot="content">{{search.join("/")}}</div>
                 <el-cascader
                         ref="cascader"
                         v-model="search"
                         placeholder="请选择城市"
                         :props="{ value: 'name',label: 'name',children: 'children'}"
                         :options="options"
-                        @change="selectChange"
                         :disabled="loading"
+                        clearable
                         filterable></el-cascader>
             </el-tooltip>
             <el-button icon="el-icon-search" @click="getData" :disabled="loading" type="primary">搜索</el-button>
@@ -2621,15 +2621,17 @@
 
                 if(this.search.length){
                     this.loading = true;
+                    this.selectChange();
                     const weather_city = this.search.join("/");
                     this.$api.weather({
                             params: this.coordinate
                         }
                     ).then(resp => {
                         if(resp.success){
-                            this.$message.success({
+                            this.$notify({
                                 message: resp.msg,
                                 duration: 1000,
+                                type: "success"
                             });
                             this.weather_data = resp.data;
                             this.weather_city = weather_city;
@@ -2643,9 +2645,9 @@
                         this.loading = false;
                     })
                 }else{
-                    this.$message.info({
+                    this.$notify.info({
                         message: '请选择城市',
-                        duration: 2000,
+                        duration: 2000
                     })
                 }
 
@@ -2666,16 +2668,16 @@
             },
             // 获取选中的经纬度
             selectChange(){
+
                 let getCheckedNodes = this.$refs.cascader.getCheckedNodes()[0];
                 let data = getCheckedNodes.data;
                 this.coordinate.lon = data.lon;
                 this.coordinate.lat = data.lat;
             },
             fail(msg){
-                this.$message.error({
+                this.$notify.error({
                     message: msg,
                     duration: 2000,
-                    center: true
                 })
             }
         },
